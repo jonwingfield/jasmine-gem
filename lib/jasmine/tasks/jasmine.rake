@@ -1,6 +1,6 @@
 namespace :jasmine do
   task :require do
-    require 'jasmine'
+    require '~/code/ruby/jasmine-gem/lib/jasmine'
   end
 
   task :require_json do

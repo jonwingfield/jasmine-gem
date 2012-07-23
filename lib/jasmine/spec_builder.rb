@@ -13,8 +13,8 @@ module Jasmine
     def start
       guess_example_locations
 
-      start_jasmine_server
-      @client = Jasmine::SeleniumDriver.new(browser, "#{jasmine_host}:#{@jasmine_server_port}/")
+      # start_jasmine_server
+      @client = Jasmine::SeleniumDriver.new(browser, "#{jasmine_host}:#{jasmine_port}/#{jasmine_spec_html}")
       @client.connect
       load_suite_info
       wait_for_suites_to_finish_running
@@ -92,16 +92,16 @@ module Jasmine
       puts out unless out.empty?
     end
 
-    def start_server(port = 8888)
-      if defined? Rack::Server # Rack ~>1.0 compatibility
-        server = Rack::Server.new(:Port => port, :AccessLog => [])
-        server.instance_variable_set(:@app, Jasmine.app(@config)) # workaround for Rack bug, when Rack > 1.2.1 is released Rack::Server.start(:app => Jasmine.app(self)) will work
-        server.start
-      else
-        handler = Rack::Handler.get('webrick')
-        handler.run(Jasmine.app(@config), :Port => port, :AccessLog => [])
-      end
-    end
+    # def start_server(port = 8888)
+    #   if defined? Rack::Server # Rack ~>1.0 compatibility
+    #     server = Rack::Server.new(:Port => port, :AccessLog => [])
+    #     server.instance_variable_set(:@app, Jasmine.app(@config)) # workaround for Rack bug, when Rack > 1.2.1 is released Rack::Server.start(:app => Jasmine.app(self)) will work
+    #     server.start
+    #   else
+    #     handler = Rack::Handler.get('webrick')
+    #     handler.run(Jasmine.app(@config), :Port => port, :AccessLog => [])
+    #   end
+    # end
 
     private
 
@@ -183,19 +183,23 @@ module Jasmine
       ENV["JASMINE_PORT"] || Jasmine::find_unused_port
     end
 
-    def start_jasmine_server
-      require 'json'
-      @jasmine_server_port = jasmine_port
-      t = Thread.new do
-        begin
-          start_server(@jasmine_server_port)
-        rescue ChildProcess::TimeoutError; end
-        #ignore bad exits
-      end
-      t.abort_on_exception = true
-      Jasmine::wait_for_listener(@jasmine_server_port, "jasmine server")
-      puts "jasmine server started."
+    def jasmine_spec_html
+      ENV['JASMINE_SPEC_HTML'] || ''
     end
+
+    # def start_jasmine_server
+    #   require 'json'
+    #   @jasmine_server_port = jasmine_port
+    #   t = Thread.new do
+    #     begin
+    #       start_server(@jasmine_server_port)
+    #     rescue ChildProcess::TimeoutError; end
+    #     #ignore bad exits
+    #   end
+    #   t.abort_on_exception = true
+    #   Jasmine::wait_for_listener(@jasmine_server_port, "jasmine server")
+    #   puts "jasmine server started."
+    # end
 
     def windows?
       require 'rbconfig'

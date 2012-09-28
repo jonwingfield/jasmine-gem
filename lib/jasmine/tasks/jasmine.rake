@@ -1,6 +1,6 @@
 namespace :jasmine do
   task :require do
-    require 'jasmine'
+    require File.join(Dir.getwd, 'jasmine-gem/lib/jasmine')
   end
 
   task :require_json do
